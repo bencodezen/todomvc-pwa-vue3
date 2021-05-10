@@ -1,8 +1,20 @@
 <script>
+import useIndexedDB from './features/useIndexedDB'
+
 export default {
   name: 'App',
+  setup() {
+    const { getDatabase, getTodos, saveTodo } = useIndexedDB
+
+    return {
+      getDatabase,
+      getTodos,
+      saveTodo
+    }
+  },
   // app initial state
   data: () => ({
+    todoDatabase: null,
     todos: [],
     newTodo: '',
     editedTodo: null,
@@ -58,16 +70,19 @@ export default {
       return word + (count === 1 ? '' : 's')
     },
 
-    addTodo: function() {
-      var value = this.newTodo && this.newTodo.trim()
-      if (!value) {
-        return
-      }
-      this.todos.push({
+    async addTodo() {
+      const value = this.newTodo && this.newTodo.trim()
+      const todoItem = {
         id: this.todos.length + 1,
         title: value,
         completed: false
-      })
+      }
+
+      if (!value) {
+        return
+      }
+      this.todos.push(todoItem)
+      await this.saveTodo(todoItem, this.todoDatabase)
       this.newTodo = ''
     },
 
@@ -102,21 +117,26 @@ export default {
     }
   },
 
+  async created() {
+    this.todoDatabase = await this.getDatabase()
+    this.todos = await this.getTodos(this.todoDatabase)
+  }
+
   // a custom directive to wait for the DOM to be updated
   // before focusing on the input field.
   // http://vuejs.org/guide/custom-directive.html
-  directives: {
-    'todo-focus': function(el, binding) {
-      if (binding.value) {
-        el.focus()
-      }
-    }
-  }
+  // directives: {
+  //   'todo-focus': function(el, binding) {
+  //     if (binding.value) {
+  //       el.focus()
+  //     }
+  //   }
+  // }
 }
 </script>
 
 <template>
-  <section class="todoapp" v-cloak>
+  <section class="todoapp">
     <header class="header">
       <h1>todos</h1>
       <input
@@ -152,7 +172,6 @@ export default {
             class="edit"
             type="text"
             v-model="todo.title"
-            v-todo-focus="todo == editedTodo"
             @blur="doneEdit(todo)"
             @keyup.enter="doneEdit(todo)"
             @keyup.esc="cancelEdit(todo)"
