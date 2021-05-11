@@ -86,6 +86,16 @@ export default {
       this.newTodo = ''
     },
 
+    async updateTodo(todo) {
+      await this.saveTodo(
+        {
+          ...todo,
+          completed: !todo.completed
+        },
+        this.todoDatabase
+      )
+    },
+
     removeTodo: function(todo) {
       var index = this.todos.indexOf(todo)
       this.todos.splice(index, 1)
@@ -154,6 +164,7 @@ export default {
         class="toggle-all"
         type="checkbox"
         v-model="allDone"
+        @click="saveTodo"
       />
       <label for="toggle-all">Mark all as complete</label>
       <ul class="todo-list">
@@ -164,7 +175,7 @@ export default {
           :class="{ completed: todo.completed, editing: todo == editedTodo }"
         >
           <div class="view">
-            <input class="toggle" type="checkbox" v-model="todo.completed" />
+            <input class="toggle" type="checkbox" @click="updateTodo(todo)" />
             <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
             <button class="destroy" @click="removeTodo(todo)"></button>
           </div>
