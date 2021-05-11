@@ -35,17 +35,16 @@ export default {
   // http://vuejs.org/guide/computed.html
   computed: {
     activeTasks() {
-      return this.todos.filter(function(todo) {
-        return !todo.completed
-      })
-    },
-    completed: function() {
-      return this.todos.filter(function(todo) {
-        return todo.completed
-      })
-    },
-    filteredTodos: function() {
       return this.todos.filter(todo => !todo.completed)
+    },
+    filteredTodos() {
+      if (this.visibility === 'all') {
+        return this.todos
+      } else if (this.visibility === 'active') {
+        return this.activeTasks
+      } else {
+        return this.todos.filter(todo => todo.completed)
+      }
     },
     remaining: function() {
       // return filters.active(this.todos).length
@@ -197,17 +196,31 @@ export default {
       </span>
       <ul class="filters">
         <li>
-          <a href="#/all" :class="{ selected: visibility == 'all' }">All</a>
+          <button
+            @click="visibility = 'all'"
+            :class="{ selected: visibility == 'all' }"
+            class="btn"
+          >
+            All
+          </button>
         </li>
         <li>
-          <a href="#/active" :class="{ selected: visibility == 'active' }"
-            >Active</a
+          <button
+            @click="visibility = 'active'"
+            :class="{ selected: visibility == 'active' }"
+            class="btn"
           >
+            Active
+          </button>
         </li>
         <li>
-          <a href="#/completed" :class="{ selected: visibility == 'completed' }"
-            >Completed</a
+          <button
+            @click="visibility = 'completed'"
+            :class="{ selected: visibility == 'completed' }"
+            class="btn"
           >
+            Completed
+          </button>
         </li>
       </ul>
       <button
@@ -239,5 +252,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.btn {
+  padding: 0 10px;
 }
 </style>
