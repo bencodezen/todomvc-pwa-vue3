@@ -4,35 +4,21 @@ import useIndexedDB from './features/useIndexedDB'
 export default {
   name: 'App',
   setup() {
-    const { getDatabase, getTodos, saveTodo } = useIndexedDB
+    const { getTodos, saveTodo } = useIndexedDB
 
     return {
-      getDatabase,
       getTodos,
       saveTodo
     }
   },
   // app initial state
   data: () => ({
-    todoDatabase: null,
     todos: [],
     newTodo: '',
     editedTodo: null,
     visibility: 'all'
   }),
 
-  // watch todos change for localStorage persistence
-  // watch: {
-  //   todos: {
-  //     deep: true,
-  //     handler() {
-  //       console.log('hello')
-  //     }
-  //   }
-  // },
-
-  // computed properties
-  // http://vuejs.org/guide/computed.html
   computed: {
     activeTasks() {
       return this.todos.filter(todo => !todo.completed)
@@ -81,18 +67,15 @@ export default {
         return
       }
       this.todos.push(todoItem)
-      await this.saveTodo(todoItem, this.todoDatabase)
+      await this.saveTodo(todoItem)
       this.newTodo = ''
     },
 
     async updateTodo(todo) {
-      await this.saveTodo(
-        {
-          ...todo,
-          completed: !todo.completed
-        },
-        this.todoDatabase
-      )
+      await this.saveTodo({
+        ...todo,
+        completed: !todo.completed
+      })
     },
 
     removeTodo: function(todo) {
@@ -127,8 +110,7 @@ export default {
   },
 
   async created() {
-    this.todoDatabase = await this.getDatabase()
-    this.todos = await this.getTodos(this.todoDatabase)
+    this.todos = await this.getTodos()
   }
 
   // a custom directive to wait for the DOM to be updated
