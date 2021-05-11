@@ -4,9 +4,10 @@ import useIndexedDB from './features/useIndexedDB'
 export default {
   name: 'App',
   setup() {
-    const { getTodos, saveTodo } = useIndexedDB
+    const { deleteTodo, getTodos, saveTodo } = useIndexedDB
 
     return {
+      deleteTodo,
       getTodos,
       saveTodo
     }
@@ -72,15 +73,18 @@ export default {
     },
 
     async updateTodo(todo) {
-      await this.saveTodo({
+      this.saveTodo({
         ...todo,
         completed: !todo.completed
+      }).then(() => {
+        this.todos.find(item => item === todo).completed = !todo.completed
       })
     },
 
     removeTodo: function(todo) {
       var index = this.todos.indexOf(todo)
       this.todos.splice(index, 1)
+      this.deleteTodo(todo)
     },
 
     editTodo: function(todo) {
@@ -105,24 +109,19 @@ export default {
     },
 
     removeCompleted: function() {
-      this.todos = [] // filters.active(this.todos)
+      this.todos = this.todos.filter(item => {
+        if (item.completed) {
+          this.deleteTodo(item)
+        } else {
+          return item
+        }
+      })
     }
   },
 
   async created() {
     this.todos = await this.getTodos()
   }
-
-  // a custom directive to wait for the DOM to be updated
-  // before focusing on the input field.
-  // http://vuejs.org/guide/custom-directive.html
-  // directives: {
-  //   'todo-focus': function(el, binding) {
-  //     if (binding.value) {
-  //       el.focus()
-  //     }
-  //   }
-  // }
 }
 </script>
 
@@ -156,7 +155,12 @@ export default {
           :class="{ completed: todo.completed, editing: todo == editedTodo }"
         >
           <div class="view">
-            <input class="toggle" type="checkbox" @click="updateTodo(todo)" />
+            <input
+              class="toggle"
+              type="checkbox"
+              @click="updateTodo(todo)"
+              :checked="todo.completed"
+            />
             <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
             <button class="destroy" @click="removeTodo(todo)"></button>
           </div>
