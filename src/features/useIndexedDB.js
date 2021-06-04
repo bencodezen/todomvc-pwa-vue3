@@ -36,12 +36,12 @@ const deleteTodo = async todo => {
   const db = await getDatabase()
 
   return new Promise(resolve => {
-    let trans = db.transaction([ITEM_NAME], 'readwrite')
-    trans.oncomplete = () => {
+    let transaction = db.transaction([ITEM_NAME], 'readwrite')
+    transaction.oncomplete = () => {
       resolve()
     }
 
-    let store = trans.objectStore(ITEM_NAME)
+    let store = transaction.objectStore(ITEM_NAME)
     store.delete(todo.id)
   })
 }
@@ -50,12 +50,12 @@ const getTodos = async () => {
   const db = await getDatabase()
 
   return new Promise(resolve => {
-    let trans = db.transaction([ITEM_NAME], 'readonly')
-    trans.oncomplete = () => {
+    let transaction = db.transaction([ITEM_NAME], 'readonly')
+    transaction.oncomplete = () => {
       resolve(todos)
     }
 
-    let store = trans.objectStore(ITEM_NAME)
+    let store = transaction.objectStore(ITEM_NAME)
     let todos = []
 
     store.openCursor().onsuccess = e => {
@@ -72,12 +72,12 @@ const saveTodo = async todo => {
   const db = await getDatabase()
 
   return new Promise(resolve => {
-    let trans = db.transaction([ITEM_NAME], 'readwrite')
-    trans.oncomplete = () => {
+    let transaction = db.transaction([ITEM_NAME], 'readwrite')
+    transaction.oncomplete = () => {
       resolve()
     }
 
-    let store = trans.objectStore(ITEM_NAME)
+    let store = transaction.objectStore(ITEM_NAME)
     store.put(todo)
   })
 }

@@ -34,16 +34,15 @@ export default {
       }
     },
     remaining() {
-      // return filters.active(this.todos).length
       return this.activeTasks.length
     },
     allDone: {
       get() {
         return this.remaining === 0
       },
-      set(value) {
-        this.todos.forEach(todo => {
-          todo.completed = value
+      set() {
+        this.todos.forEach(async todo => {
+          await this.updateTodo(todo)
         })
       }
     }
@@ -81,10 +80,10 @@ export default {
       this.todos.find(item => item === todo).completed = !todo.completed
     },
 
-    removeTodo(todo) {
+    async removeTodo(todo) {
       const index = this.todos.indexOf(todo)
+      await this.deleteTodo(todo)
       this.todos.splice(index, 1)
-      this.deleteTodo(todo)
     },
 
     editTodo(todo) {
@@ -109,9 +108,9 @@ export default {
     },
 
     removeCompleted() {
-      this.todos = this.todos.filter(item => {
+      this.todos = this.todos.filter(async item => {
         if (item.completed) {
-          this.deleteTodo(item)
+          await this.deleteTodo(item)
         } else {
           return item
         }
@@ -144,7 +143,6 @@ export default {
         class="toggle-all"
         type="checkbox"
         v-model="allDone"
-        @click="saveTodo"
       />
       <label for="toggle-all">Mark all as complete</label>
       <ul class="todo-list">
