@@ -73,12 +73,12 @@ export default {
     },
 
     async updateTodo(todo) {
-      this.saveTodo({
+      await this.saveTodo({
         ...todo,
         completed: !todo.completed
-      }).then(() => {
-        this.todos.find(item => item === todo).completed = !todo.completed
       })
+
+      this.todos.find(item => item === todo).completed = !todo.completed
     },
 
     removeTodo(todo) {
