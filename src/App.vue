@@ -33,16 +33,16 @@ export default {
         return this.todos.filter(todo => todo.completed)
       }
     },
-    remaining: function() {
+    remaining() {
       // return filters.active(this.todos).length
       return this.activeTasks.length
     },
     allDone: {
-      get: function() {
+      get() {
         return this.remaining === 0
       },
-      set: function(value) {
-        this.todos.forEach(function(todo) {
+      set(value) {
+        this.todos.forEach(todo => {
           todo.completed = value
         })
       }
@@ -52,7 +52,7 @@ export default {
   // methods that implement data logic.
   // note there's no DOM manipulation here at all.
   methods: {
-    pluralize: function(word, count) {
+    pluralize(word, count) {
       return word + (count === 1 ? '' : 's')
     },
 
@@ -81,18 +81,18 @@ export default {
       })
     },
 
-    removeTodo: function(todo) {
-      var index = this.todos.indexOf(todo)
+    removeTodo(todo) {
+      const index = this.todos.indexOf(todo)
       this.todos.splice(index, 1)
       this.deleteTodo(todo)
     },
 
-    editTodo: function(todo) {
+    editTodo(todo) {
       this.beforeEditCache = todo.title
       this.editedTodo = todo
     },
 
-    doneEdit: function(todo) {
+    doneEdit(todo) {
       if (!this.editedTodo) {
         return
       }
@@ -103,12 +103,12 @@ export default {
       }
     },
 
-    cancelEdit: function(todo) {
+    cancelEdit(todo) {
       this.editedTodo = null
       todo.title = this.beforeEditCache
     },
 
-    removeCompleted: function() {
+    removeCompleted() {
       this.todos = this.todos.filter(item => {
         if (item.completed) {
           this.deleteTodo(item)
